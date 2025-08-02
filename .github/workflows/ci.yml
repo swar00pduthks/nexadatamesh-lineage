@@ -7,8 +7,47 @@ on:
     branches: [ main ]
 
 jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    name: Code Quality Checks
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+    - name: Check code formatting
+      run: mvn spotless:check
+    
+    - name: Run static analysis
+      run: mvn pmd:check
+    
+    - name: Run tests with coverage
+      run: mvn test jacoco:report
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./api/target/site/jacoco/jacoco.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
   test:
     runs-on: ubuntu-latest
+    name: Build and Test
     
     services:
       postgres:
@@ -47,7 +86,20 @@ jobs:
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
         restore-keys: ${{ runner.os }}-m2
     
-    - name: Run tests
+    - name: Cache Node modules
+      uses: actions/cache@v4
+      with:
+        path: web/node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('web/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-node-
+    
+    - name: Install web dependencies
+      run: cd web && npm ci
+    
+    - name: Run web tests
+      run: cd web && npm test
+    
+    - name: Run API tests
       run: mvn test
     
     - name: Build project
@@ -58,10 +110,9 @@ jobs:
         docker build -t nexa-lineage-api:latest api/
         docker build -t nexa-lineage-web:latest web/
 
-  build:
-    needs: test
+  security:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    name: Security Scan
     
     steps:
     - uses: actions/checkout@v4
@@ -73,19 +124,33 @@ jobs:
         distribution: 'temurin'
         cache: maven
     
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
+    - name: Run OWASP dependency check
+      uses: dependency-check/Dependency-Check_Action@main
       with:
-        node-version: '18'
-        cache: 'npm'
+        project: 'Nexa Lineage'
+        path: '.'
+        format: 'HTML'
+        out: 'reports'
+        args: >
+          --failOnCVSS 7
+          --enableRetired
+
+  build:
+    needs: [test, code-quality, security]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    name: Build and Deploy
     
-    - name: Build and package
-      run: mvn clean package -DskipTests
+    steps:
+    - uses: actions/checkout@v4
     
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
       with:
-        name: build-artifacts
-        path: |
-          api/target/*.jar
-          web/target/*.jar 
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Build and push Docker images
+      run: |
+        echo "Build and push logic here" 

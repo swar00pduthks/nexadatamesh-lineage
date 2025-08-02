@@ -3,6 +3,7 @@ import { Database, GitBranch, BarChart3, ArrowLeft, Sun, Moon } from 'lucide-rea
 import { NamespacesList } from './components/NamespacesList'
 import { DatasetsList } from './components/DatasetsList'
 import { LineageGraph } from './components/LineageGraph'
+import { NexaLogo } from './components/NexaLogo'
 
 type View = 'dashboard' | 'namespaces' | 'datasets' | 'graph'
 
@@ -28,6 +29,17 @@ function App() {
       localStorage.setItem('theme', 'light')
     }
   }, [darkMode])
+
+  useEffect(() => {
+    // Set document title based on current view
+    const titles = {
+      dashboard: 'Nexa Lineage - Data Lineage Platform',
+      namespaces: 'Namespaces - Nexa Lineage',
+      datasets: 'Datasets - Nexa Lineage',
+      graph: 'Lineage Graph - Nexa Lineage'
+    }
+    document.title = titles[currentView] || 'Nexa Lineage'
+  }, [currentView])
 
   const toggleTheme = () => {
     setDarkMode(!darkMode)
@@ -132,22 +144,8 @@ function App() {
                 </button>
               )}
                               <div className="flex items-center">
-                  {/* Nexa DataMesh Logo */}
-                  <div className="w-10 h-10 bg-gray-900 dark:bg-white rounded-lg flex items-center justify-center mr-4">
-                    <div className="w-6 h-6 relative">
-                      {/* Network nodes */}
-                      <div className="absolute top-0 left-0 w-1.5 h-1.5 bg-white dark:bg-gray-900 rounded-full"></div>
-                      <div className="absolute top-0 right-0 w-1.5 h-1.5 bg-white dark:bg-gray-900 rounded-full"></div>
-                      <div className="absolute bottom-0 left-0 w-1.5 h-1.5 bg-white dark:bg-gray-900 rounded-full"></div>
-                      <div className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-white dark:bg-gray-900 rounded-full"></div>
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-white dark:bg-gray-900 rounded-full"></div>
-                      {/* Network lines */}
-                      <div className="absolute top-0.5 left-0.5 w-3 h-px bg-white dark:bg-gray-900 transform rotate-45 origin-left"></div>
-                      <div className="absolute top-0.5 right-0.5 w-3 h-px bg-white dark:bg-gray-900 transform -rotate-45 origin-right"></div>
-                      <div className="absolute bottom-0.5 left-0.5 w-3 h-px bg-white dark:bg-gray-900 transform -rotate-45 origin-left"></div>
-                      <div className="absolute bottom-0.5 right-0.5 w-3 h-px bg-white dark:bg-gray-900 transform rotate-45 origin-right"></div>
-                    </div>
-                  </div>
+                  {/* Nexa Logo */}
+                  <NexaLogo size={40} className="mr-4" />
                   <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
                     Nexa Lineage
                   </h1>
