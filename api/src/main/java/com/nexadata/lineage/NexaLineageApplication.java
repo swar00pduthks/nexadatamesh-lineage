@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class NexaLineageApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(NexaLineageApplication.class, args);
-    }
-} 
+  public static void main(String[] args) {
+    SpringApplication.run(NexaLineageApplication.class, args);
+  }
+}
