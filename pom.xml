@@ -73,9 +73,9 @@
                                 <style>GOOGLE</style>
                             </googleJavaFormat>
                             <removeUnusedImports/>
-                            <importOrder>
-                                <order>java,javax,org,com,</order>
-                            </importOrder>
+                                                    <importOrder>
+                            <order>java,jakarta,org,com,</order>
+                        </importOrder>
                         </java>
                         <xml>
                             <indent>

@@ -29,7 +29,11 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
     
     - name: Check code formatting
-      run: mvn spotless:check || echo "Spotless check temporarily disabled"
+      run: mvn spotless:check
+      
+    - name: Apply code formatting (if needed)
+      run: mvn spotless:apply
+      if: failure()
     
     - name: Run static analysis
       run: mvn pmd:check
