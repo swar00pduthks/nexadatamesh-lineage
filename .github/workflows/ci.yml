@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, feature/** ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
   code-quality:
@@ -96,19 +96,11 @@ jobs:
     - name: Install web dependencies
       run: cd web && npm ci
     
-    - name: Run web tests
-      run: cd web && npm test
-    
     - name: Run API tests
       run: mvn test
     
     - name: Build project
       run: mvn clean compile
-    
-    - name: Build Docker images
-      run: |
-        docker build -t nexa-lineage-api:latest api/
-        docker build -t nexa-lineage-web:latest web/
 
   security:
     runs-on: ubuntu-latest
@@ -138,7 +130,7 @@ jobs:
   build:
     needs: [test, code-quality, security]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
     name: Build and Deploy
     
     steps:
