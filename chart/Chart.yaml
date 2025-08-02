@@ -1,0 +1,16 @@
+apiVersion: v2
+name: nexa-lineage
+description: A Helm chart for Nexa Lineage Data Service
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - data-lineage
+  - metadata
+  - data-mesh
+home: https://github.com/swar00pduthks/nexadatamesh-lineage
+sources:
+  - https://github.com/swar00pduthks/nexadatamesh-lineage
+maintainers:
+  - name: swar00pduthks
+    email: swar00pduthks@example.com 
