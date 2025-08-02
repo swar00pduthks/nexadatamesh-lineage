@@ -50,13 +50,14 @@ jobs:
     name: Build and Test
     
     services:
-      postgres:
-        image: postgres:14
+      postgresql:
+        image: postgres:15
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
+          POSTGRES_DB: nexa_lineage
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
         options: >-
-          --health-cmd pg_isready
+          --health-cmd pg_isready -U postgres
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -64,12 +65,9 @@ jobs:
           - 5432:5432
       
       neo4j:
-        image: neo4j:5.15
+        image: neo4j:5.11
         env:
           NEO4J_AUTH: neo4j/password
-          NEO4J_apoc_export_file_enabled: true
-          NEO4J_apoc_import_file_enabled: true
-          NEO4J_apoc_import_file_use__neo4j__config: true
           NEO4J_PLUGINS: '["apoc"]'
         options: >-
           --health-cmd wget --no-verbose --tries=1 --spider http://localhost:7474/browser/ || exit 1
@@ -102,11 +100,17 @@ jobs:
     - name: Run API tests
       run: mvn test
     
-    - name: Test Neo4j connectivity
+    - name: Test database connectivity
       run: |
+        echo "Testing PostgreSQL connectivity..."
+        pg_isready -h localhost -p 5432 -U postgres || echo "PostgreSQL not accessible"
+        
         echo "Testing Neo4j connectivity..."
         curl -f http://localhost:7474/browser/ || echo "Neo4j browser not accessible"
         echo "Neo4j bolt port 7687 should be available for application tests"
+        
+        echo "Note: For more complex scenarios, you can use development/docker-compose.yml"
+        echo "Example: cd development && docker-compose up -d postgresql neo4j"
     
     - name: Build project
       run: mvn clean compile
