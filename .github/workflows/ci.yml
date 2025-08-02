@@ -1,0 +1,169 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, feature/** ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  code-quality:
+    runs-on: ubuntu-latest
+    name: Code Quality Checks
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+    - name: Check code formatting
+      run: mvn spotless:check
+      
+    - name: Apply code formatting (if needed)
+      run: mvn spotless:apply
+      if: failure()
+    
+    - name: Run static analysis
+      run: mvn pmd:check
+    
+    - name: Run tests with coverage
+      run: mvn test jacoco:report
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./api/target/site/jacoco/jacoco.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  test:
+    runs-on: ubuntu-latest
+    name: Build and Test
+    
+    services:
+      postgresql:
+        image: postgres:15
+        env:
+          POSTGRES_DB: nexa_lineage
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      neo4j:
+        image: neo4j:5.11
+        env:
+          NEO4J_AUTH: neo4j/password
+          NEO4J_PLUGINS: '["apoc"]'
+        options: >-
+          --health-cmd "wget --no-verbose --tries=1 --spider http://localhost:7474/browser/ || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 7474:7474
+          - 7687:7687
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Cache Maven packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+
+    
+    - name: Run API tests
+      run: mvn test
+    
+    - name: Test database connectivity
+      run: |
+        echo "Testing PostgreSQL connectivity..."
+        pg_isready -h localhost -p 5432 -U postgres || echo "PostgreSQL not accessible"
+        
+        echo "Testing Neo4j connectivity..."
+        curl -f http://localhost:7474/browser/ || echo "Neo4j browser not accessible"
+        echo "Neo4j bolt port 7687 should be available for application tests"
+        
+        echo "Note: For more complex scenarios, you can use development/docker-compose.yml"
+        echo "Example: cd development && docker-compose up -d postgresql neo4j"
+    
+    - name: Build project
+      run: mvn clean compile
+
+
+
+  build:
+    needs: [test, code-quality]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/feature/Init-first-check-in'
+    name: Build and Deploy
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Build and push API Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./api
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/nexa-lineage-api:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/nexa-lineage-api:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    
+    - name: Build and push Web Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./web
+        push: true
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/nexa-lineage-web:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/nexa-lineage-web:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max 
