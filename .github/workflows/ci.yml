@@ -57,7 +57,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: password
         options: >-
-          --health-cmd pg_isready -U postgres
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -70,7 +70,7 @@ jobs:
           NEO4J_AUTH: neo4j/password
           NEO4J_PLUGINS: '["apoc"]'
         options: >-
-          --health-cmd wget --no-verbose --tries=1 --spider http://localhost:7474/browser/ || exit 1
+          --health-cmd "wget --no-verbose --tries=1 --spider http://localhost:7474/browser/ || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
