@@ -1,0 +1,91 @@
+tasks:
+  - name: Start Development Environment
+    init: |
+      echo "🚀 Starting Nexa Lineage Development Environment"
+      echo "📦 Installing dependencies..."
+      cd api && mvn clean install -DskipTests
+      cd ../web && npm install
+      cd ..
+    command: |
+      echo "🐳 Starting databases with Docker Compose..."
+      cd .gitpod
+      docker-compose up -d postgresql neo4j
+      echo "⏳ Waiting for databases to be ready..."
+      sleep 30
+      echo "✅ Databases started successfully!"
+      echo ""
+      echo "🎯 Next steps:"
+      echo "1. Start API: cd api && mvn spring-boot:run"
+      echo "2. Start UI: cd web && npm run dev"
+      echo "3. Access databases:"
+      echo "   - PostgreSQL: localhost:5432"
+      echo "   - Neo4j Browser: http://localhost:7474"
+      echo "   - Neo4j Bolt: localhost:7687"
+      echo ""
+      echo "📚 Documentation:"
+      echo "- API Docs: http://localhost:8080/api/swagger-ui.html"
+      echo "- UI: http://localhost:3000"
+      echo ""
+      echo "🔧 Development tools:"
+      echo "- Code quality: mvn spotless:apply"
+      echo "- Tests: mvn test"
+      echo "- Coverage: mvn jacoco:report"
+      echo ""
+      echo "🌐 Gitpod URLs:"
+      echo "- API: https://8080-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      echo "- UI: https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+      echo "- Neo4j: https://7474-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
+
+  - name: Start API Server
+    command: |
+      echo "🔧 Starting Spring Boot API..."
+      cd api
+      mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dserver.port=8080"
+    openMode: split-right
+
+  - name: Start Web UI
+    command: |
+      echo "🌐 Starting React UI..."
+      cd web
+      npm run dev -- --host 0.0.0.0 --port 3000
+    openMode: split-right
+
+ports:
+  - port: 8080
+    name: API Server
+    description: Spring Boot API with Swagger UI
+    onOpen: open-preview
+  - port: 3000
+    name: Web UI
+    description: React development server
+    onOpen: open-preview
+  - port: 7474
+    name: Neo4j Browser
+    description: Neo4j web interface
+    onOpen: open-preview
+  - port: 5432
+    name: PostgreSQL
+    description: PostgreSQL database
+    onOpen: ignore
+
+vscode:
+  extensions:
+    - vscjava.vscode-java-pack
+    - redhat.java
+    - vscjava.vscode-maven
+    - ms-vscode.vscode-typescript-next
+    - bradlc.vscode-tailwindcss
+    - esbenp.prettier-vscode
+    - ms-vscode.vscode-json
+    - ms-vscode.vscode-yaml
+    - ms-azuretools.vscode-docker
+    - ms-kubernetes-tools.vscode-kubernetes-tools
+    - github.copilot
+    - github.copilot-chat
+
+image: gitpod/workspace-full:latest
+
+workspaceLocation: "."
+
+# GitHub prebuilds are now configured in Project Settings
+# Visit: https://gitpod.io/workspaces to configure prebuilds 
