@@ -1,167 +1,138 @@
 # Contributing to Nexa Lineage
 
-Thank you for your interest in contributing to Nexa Lineage! This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to Nexa Lineage! This document provides guidelines and standards for contributing to the project.
 
-## Table of Contents
-
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [Code Style](#code-style)
-- [Testing](#testing)
-- [Pull Request Process](#pull-request-process)
-- [Reporting Issues](#reporting-issues)
-
-## Code of Conduct
-
-This project and its participants are governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
-
-## Getting Started
+## 🚀 Quick Start
 
 1. **Fork the repository**
-2. **Clone your fork**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/nexadatamesh-lineage.git
-   cd nexadatamesh-lineage
-   ```
-3. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
+3. **Make your changes**
+4. **Run tests**: `mvn test`
+5. **Format code**: `mvn spotless:apply`
+6. **Commit changes**: `git commit -m "feat: your feature description"`
+7. **Push to your fork**: `git push origin feature/your-feature-name`
+8. **Create a Pull Request**
 
-## Development Setup
+## 📋 Pull Request Standards
 
-### Prerequisites
+### 🎯 PR Template
+We use a comprehensive PR template that includes:
 
-- Java 17 or higher
-- Maven 3.8.0 or higher
-- Node.js 18 or higher (for web UI)
-- Docker and Docker Compose (for local development)
+- **Type of Change**: Bug fix, feature, breaking change, etc.
+- **Testing Checklist**: Unit tests, integration tests, manual testing
+- **Code Quality**: Spotless, PMD, documentation
+- **Security**: Vulnerability checks, input validation
+- **Deployment**: Docker builds, Kubernetes manifests
+- **Review Checklist**: For reviewers to follow
 
-### Local Development
+### ✅ Required Checks
+All PRs must pass:
 
-1. **Start the development environment**
-   ```bash
-   cd development
-   docker-compose up -d
-   ```
+- **Code Quality Checks**: Spotless, PMD, JaCoCo
+- **Build and Test**: Maven build, unit tests, integration tests
+- **Build and Deploy**: Docker image builds (for main/develop)
 
-2. **Build the project**
-   ```bash
-   mvn clean compile
-   ```
+### 🔍 Review Process
+1. **Self-review**: Complete the checklist in the PR template
+2. **Code review**: At least one other developer must review
+3. **CI/CD checks**: All automated checks must pass
+4. **Documentation**: Update docs if needed
+5. **Testing**: Ensure all tests pass
 
-3. **Run the API**
-   ```bash
-   mvn spring-boot:run -pl api
-   ```
+## 🏗️ Development Standards
 
-4. **Run the web UI**
-   ```bash
-   cd web
-   npm install
-   npm run dev
-   ```
+### 📝 Code Style
+- **Java**: Google Java Format (enforced by Spotless)
+- **TypeScript**: Prettier configuration
+- **Naming**: Follow Java/TypeScript conventions
+- **Comments**: Document complex logic
+- **Error Handling**: Proper exception handling
 
-## Code Style
+### 🧪 Testing Standards
+- **Unit Tests**: Minimum 80% code coverage
+- **Integration Tests**: Database and API tests
+- **Test Naming**: Descriptive test method names
+- **Test Data**: Use test fixtures, not hardcoded data
+- **Mocking**: Mock external dependencies
 
-### Java Code
+### 🔒 Security Standards
+- **Input Validation**: Validate all user inputs
+- **Authentication**: Implement proper auth where needed
+- **Authorization**: Check permissions appropriately
+- **Secrets**: Never commit secrets to Git
+- **Dependencies**: Keep dependencies updated
 
-We use the following tools to maintain code quality:
+### 🐳 Docker Standards
+- **Multi-stage builds**: Optimize image size
+- **Security**: Use non-root users
+- **Caching**: Optimize layer caching
+- **Health checks**: Include health check endpoints
+- **Documentation**: Document environment variables
 
-- **Spotless**: Code formatting (Google Java Format)
+## 🚀 CI/CD Pipeline
+
+### 📊 Code Quality Tools
+- **Spotless**: Code formatting and import ordering
 - **PMD**: Static code analysis
-- **JaCoCo**: Code coverage
-- **Maven Enforcer**: Build rules
+- **JaCoCo**: Code coverage reporting
+- **GitHub Actions**: Automated CI/CD
 
-Run code quality checks:
+### 🐳 Docker Integration
+- **Build**: Multi-stage Docker builds
+- **Push**: Automatic push to Docker Hub
+- **Tags**: Latest and commit SHA tags
+- **Cache**: GitHub Actions cache optimization
+
+### 🏗️ Deployment
+- **Kubernetes**: Helm charts for deployment
+- **Environment**: Separate dev/staging/prod configs
+- **Rollback**: Automated rollback capabilities
+- **Monitoring**: Health checks and metrics
+
+## 📚 Documentation Standards
+
+### 📝 Code Documentation
+- **JavaDoc**: Document public APIs
+- **README**: Project overview and setup
+- **API Docs**: OpenAPI/Swagger documentation
+- **Architecture**: System design documentation
+
+### 🎯 User Documentation
+- **Installation**: Clear setup instructions
+- **Configuration**: Environment variables and settings
+- **Troubleshooting**: Common issues and solutions
+- **Examples**: Code examples and use cases
+
+## 🔧 Development Environment
+
+### 🛠️ Local Setup
 ```bash
-mvn spotless:check
-mvn pmd:check
-mvn test jacoco:report
-```
+# Clone repository
+git clone https://github.com/your-username/nexadatamesh-lineage.git
+cd nexa-lineage
 
-### TypeScript/JavaScript Code
+# Start databases
+cd development
+docker-compose up -d
 
-- **ESLint**: Code linting
-- **Prettier**: Code formatting
-- **TypeScript**: Type checking
+# Build and run API
+cd api
+mvn spring-boot:run
 
-Run web code quality checks:
-```bash
+# Build and run UI
 cd web
-npm run lint
-npm run type-check
+npm run dev
 ```
 
-## Testing
+### 🌐 Gitpod Setup
+- **One-click setup**: Open in Gitpod
+- **Pre-configured**: All tools and databases ready
+- **Collaborative**: Real-time collaboration
+- **Cloud-based**: No local setup required
 
-### Running Tests
+## 🎯 Commit Standards
 
-```bash
-# Run all tests
-mvn test
-
-# Run specific module tests
-mvn test -pl api
-
-# Run with coverage
-mvn test jacoco:report
-```
-
-### Writing Tests
-
-- Write unit tests for all new functionality
-- Aim for at least 80% code coverage
-- Use descriptive test names
-- Follow the AAA pattern (Arrange, Act, Assert)
-
-## Pull Request Process
-
-1. **Update documentation** if needed
-2. **Add tests** for new functionality
-3. **Ensure all tests pass**
-4. **Update the changelog** if applicable
-5. **Submit a pull request** with a clear description
-
-### Pull Request Template
-
-```markdown
-## Description
-Brief description of the changes
-
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
-
-## Testing
-- [ ] Unit tests added/updated
-- [ ] Integration tests added/updated
-- [ ] Manual testing completed
-
-## Checklist
-- [ ] Code follows style guidelines
-- [ ] Self-review completed
-- [ ] Documentation updated
-- [ ] Tests added/updated
-```
-
-## Reporting Issues
-
-When reporting issues, please include:
-
-- **Environment**: OS, Java version, Maven version
-- **Steps to reproduce**: Clear, step-by-step instructions
-- **Expected behavior**: What you expected to happen
-- **Actual behavior**: What actually happened
-- **Additional context**: Logs, screenshots, etc.
-
-## Commit Message Guidelines
-
-Use conventional commit format:
-
+### 📝 Commit Message Format
 ```
 type(scope): description
 
@@ -170,21 +141,95 @@ type(scope): description
 [optional footer]
 ```
 
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes
-- `refactor`: Code refactoring
-- `test`: Test changes
-- `chore`: Build/tool changes
+### 🏷️ Types
+- **feat**: New feature
+- **fix**: Bug fix
+- **docs**: Documentation changes
+- **style**: Code style changes (formatting, etc.)
+- **refactor**: Code refactoring
+- **test**: Adding or updating tests
+- **chore**: Maintenance tasks
 
-## Questions?
+### 📝 Examples
+```
+feat(api): add lineage graph endpoint
+fix(web): resolve favicon display issue
+docs(readme): update installation instructions
+test(api): add integration tests for dataset service
+```
 
-If you have questions, please:
+## 🔍 Review Guidelines
 
-1. Check the [documentation](README.md)
-2. Search existing [issues](https://github.com/swar00pduthks/nexadatamesh-lineage/issues)
-3. Create a new issue if needed
+### 📋 For Contributors
+- **Self-review**: Complete the PR checklist
+- **Test locally**: Ensure everything works
+- **Document changes**: Update relevant docs
+- **Respond to feedback**: Address review comments
+
+### 👀 For Reviewers
+- **Code quality**: Check readability and structure
+- **Security**: Look for vulnerabilities
+- **Testing**: Ensure adequate test coverage
+- **Documentation**: Verify docs are updated
+- **Performance**: Check for performance issues
+
+## 🚨 Breaking Changes
+
+### 📋 Guidelines
+- **Semantic versioning**: Follow semver principles
+- **Migration guide**: Provide upgrade instructions
+- **Deprecation warnings**: Give advance notice
+- **Backward compatibility**: Maintain when possible
+
+### 📝 Process
+1. **Create issue**: Document the breaking change
+2. **Update docs**: Migration guide and changelog
+3. **Version bump**: Increment major version
+4. **Communication**: Notify stakeholders
+
+## 📊 Metrics and Quality
+
+### 🎯 Quality Metrics
+- **Code coverage**: Minimum 80%
+- **Technical debt**: Track and reduce
+- **Performance**: Monitor response times
+- **Security**: Regular vulnerability scans
+
+### 📈 Performance Standards
+- **API response**: < 200ms for simple operations
+- **Database queries**: Optimized and indexed
+- **Memory usage**: Efficient resource utilization
+- **Scalability**: Horizontal scaling support
+
+## 🤝 Community Guidelines
+
+### 💬 Communication
+- **Be respectful**: Treat others with respect
+- **Be constructive**: Provide helpful feedback
+- **Be inclusive**: Welcome diverse perspectives
+- **Be patient**: Allow time for responses
+
+### 🎯 Contribution Areas
+- **Code**: Bug fixes and new features
+- **Documentation**: Improve docs and examples
+- **Testing**: Add tests and improve coverage
+- **Infrastructure**: CI/CD and deployment
+- **Design**: UI/UX improvements
+
+## 📞 Getting Help
+
+### 🆘 Support Channels
+- **GitHub Issues**: Bug reports and feature requests
+- **Discussions**: General questions and ideas
+- **Documentation**: Self-service help
+- **Community**: Connect with other contributors
+
+### 📚 Resources
+- [GitHub Issues](https://github.com/your-org/nexadatamesh-lineage/issues)
+- [Project Documentation](https://github.com/your-org/nexadatamesh-lineage/docs)
+- [API Documentation](http://localhost:8080/api/swagger-ui.html)
+- [Contributing Guide](CONTRIBUTING.md)
+
+---
 
 Thank you for contributing to Nexa Lineage! 🚀 
