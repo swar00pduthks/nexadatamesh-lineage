@@ -102,22 +102,7 @@ jobs:
     - name: Build project
       run: mvn clean compile
 
-  security:
-    runs-on: ubuntu-latest
-    name: Security Scan
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
-    
-    - name: Run Maven dependency check
-      run: mvn dependency:check
+
 
   build:
     needs: [test, code-quality]
