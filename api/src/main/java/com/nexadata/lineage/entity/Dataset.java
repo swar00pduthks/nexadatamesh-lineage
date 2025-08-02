@@ -1,6 +1,7 @@
 package com.nexadata.lineage.entity;
 
 import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 
 @Entity
